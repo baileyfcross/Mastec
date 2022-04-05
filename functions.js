@@ -1,24 +1,110 @@
-/*
-function submitButton(){
-  $(document).ready(() => {
 
+/*
+  A Majority of these functions are just test functions for the api call.
+
+  I wanted to leave them in the code in order to show what I tried and how close I might have been to solving the problem.
+ */
+
+/*
+  This section is for filling in the html once I get the data from the get requests
+*/
+
+function computeRecipes(name){
+
+}
+ // This is an example of a function that I would use once I got the data from the GET request
+ function populateFields(name,resData,pantData) {
+
+     //Recipes JSON data
+     const resObj = JSON.parse(resData);
+
+     //Pantry JSON data
+     const pantObj = JSON.parse(pantData);
+
+
+     var recipes = resObj.recipes;
+     var ingredients = resObj.ingredients;
+     var pantry = pantObj.pantry;
+
+     for (var i = 0; i < recipes.length; i++) {
+       for (var j = 0; j < ingredients.length; j++) {
+         // Subtract the ingredident requirements from the pantry and keep doing that until one of the
+         // ingredident requirements can't be met.
+       }
+     }
+     $(`#${name}`).html(function(){
+
+     });
+ }
+
+// This function uses jquery ajax call.
+// I tried the beforeSend function in order to send a preflight request because this function would always
+// Send as an OPTIONS request
+function submitButton(name){
+  var data = {};
+  $(document).ready(() => {
     $.ajax({
-       url : 'https://dev.mastecat.net/test/cooking/pantry/Alex',
+       url : `https://dev.mastecat.net/test/cooking/recipes/${name}`,
        method : 'GET',
-       beforeSend: function (xhr) {
-         xhr.setRequestHeader("Authorization", "Basic QkNyb3NzOnh4WW4xMn5+ITE=");
+       data: data,
+       headers: {
+         'Authorization': 'Basic ' + btoa('BCross:xxYn12~~!1'),
        },
        success : function(result){
-         console.log("Successful AJAX Call")
+         populateFields(name,data)
        },
        error : function(result, statut, error){
-
+         console.log(error);
+         console.log(statut);
+         console.log(result);
        }
     });
   });
 }
-*/
-function test() {
+
+// This function is the main for putting the data in the html and calling the get and post functions
+function putDataInHTML(){
+  var nameArray = ['alex','victor','brian','mark','leigh','steve'];
+  for (var i = 0; i < nameArray.length; i++) {
+    submitButton(nameArray[i]);
+  }
+}
+
+
+/* EVERYTHING UNDER THIS IS JUST EXAMPLES OF WHAT I TRIED */
+// This is the function that was suggested by Shane. It didn't end up working (probably because I'm not using nodejs)
+async function suggestion(){
+  let resp = await fetch('https://dev.mastecat.net/test/health', {
+    method: 'get',
+    headers: {
+        'Authorization': 'Basic ' + btoa('BCross:xxYn12~~!1'),
+    },
+  });
+
+  const body = await resp.text();
+
+  console.log(body);
+
+}
+
+// This was my attempt at deleting my progress and retrying from the start
+function basic(){
+  $.ajax({
+  type: "GET",
+  url: "https://dev.mastecat.net/test/cooking/recipes/Alex",
+  dataType: 'jsonp',
+  headers: {
+    "Authorization": "Basic QkNyb3NzOnh4WW4xMn5+ITE="
+  },
+  success: function (result){
+      console.log(result)
+  }
+  });
+}
+
+
+// This is another way of getting an xml request across js.
+function xmlClassic() {
   var xhr = new XMLHttpRequest();
   xhr.addEventListener('load', function(e) {
   var response = e.target.responseText;
@@ -30,22 +116,21 @@ function test() {
   xhr.open('GET', 'https://dev.mastecat.net/test/cooking/recipes/Alex');
   xhr.setRequestHeader('Authorization','Basic QkNyb3NzOnh4WW4xMn5+ITE=');
   xhr.send();
+
 }
-/*
-function simpAPI(){
+
+// These next two functions are one of my first attempts at using more headers in an options call
+function reworkAPI(){
   $(document).ready(() => {
-    var data;
+    var createRequestObject = new Object();
     $.ajax({
-       url : 'https://dev.mastecat.net/test/cooking/pantry/Alex',
+       url : 'https://dev.mastecat.net/test/cooking/recipes/Alex',
        method : 'GET',
-       beforeSend: function (xhr) {
-         xhr.setRequestHeader("authorization", "Basic QkNyb3NzOnh4WW4xMn5+ITE=");
-         xhr.setRequestHeader('Content-Type', 'application/xml');
-         xhr.setRequestHeader('Access-Control-Request-Method', 'GET');
+       beforeSend: function(xhr) {
+         xhr.setRequestHeader("Authorization",'Basic QkNyb3NzOnh4WW4xMn5+ITE=');
        },
-       dataType: 'json',
-       contentType: 'application/json; charset=utf-8',
-       data: JSON.stringify(data),
+       dataType: "JSONP",
+       data: "json=" + escape(JSON.stringify(createRequestObject)),
        success : function(result){
          console.log("Successful AJAX Call")
        },
@@ -57,13 +142,12 @@ function simpAPI(){
   });
 }
 
-*/
-function simpAPI2(){
 
+function reworkAPI2(){
   $(document).ready(() => {
     var data;
     $.ajax({
-       url : 'https://dev.mastecat.net/test/cooking/pantry/Alex',
+       url : 'https://dev.mastecat.net/test/cooking/recipes/Alex',
        xhrFields: {
         withCredentials: true
       },
@@ -87,7 +171,10 @@ function simpAPI2(){
     });
   });
 }
-/*
+
+
+// This was my attempt at using promises in an ansync function
+// While this doesn't return any errors, it also doesn't return any JSON
 function fetchMethod() {
   console.log("Executed before get request")
   var myBody = '';
@@ -121,7 +208,8 @@ function oldXML() {
   console.log(xhttp.getAllResponseHeaders())
   xhttp.send();
 }
-/*
+
+// This was my attempt at using jquery's built in get function
 function simpleGet()
 {
     var xmlHttp = new XMLHttpRequest();
@@ -136,39 +224,14 @@ function getMethod() {
   })
 }
 
-function simpleAJAX(){
-  var authorizationToken = 'QkNyb3NzOnh4WW4xMn5+ITE=';
-  $(document).ready(() => {
-    $.ajax({
-				method: 'GET',
-				url: 'https://dev.mastecat.net/test/cooking/recipes/Alex',
-        crossorigin: 'anonymous',
-        beforeSend: function(request) {
-          request.setRequestHeader("Authorization", authorizationToken);
-        },
-        headers:{
-          'Access-Control-Allow-Origin': '*',
-
-        },
-        contentType: "JSONP",
-				success: function(response) {
-					var article = $(response).find('article').first().html();
-					$('#ResponseContent h2').html('Response Content - from MasTec');
-					$('#ResponseArticle div').html(article);
-          console.log(article);
-				}
-			}).fail(function() {
-				alert("failed!");
-			});
-  });
-}
-
+// My attempt at using the getJSON function in jquery
 function getJ(){
   $.getJSON('https://dev.mastecat.net/test/cooking/recipes/Alex',function(result){
     console.log(result);
   });
 }
 
+// With Credentials parameter
 function wCred() {
   $.ajax({
     xhrFields: {
@@ -181,45 +244,3 @@ function wCred() {
     console.log(data);
   });
 }
-
-
-function callOtherDomain() {
-  const invocation = new XMLHttpRequest();
-  const url = 'https://dev.mastecat.net/test/cooking/recipes/Alex';
-    if (invocation) {
-      invocation.open('GET', url, true);
-      invocation.withCredentials = true;
-      invocation.onreadystatechange = function() {
-           if (invocation.readyState == 4 && invocation.status == 200) {
-               alert(invocation.responseText);
-           };
-      invocation.send();
-    }
-  }
-}
-
-
-function example(){
-  // Create a request variable and assign a new XMLHttpRequest object to it.
-  var request = new XMLHttpRequest()
-
-  // Open a new connection, using the GET request on the URL endpoint
-  request.open('GET', 'https://dev.mastecat.net/test/cooking/recipes/Alex', true)
-  request.setRequestHeader("Authentication", "Basic QkNyb3NzOnh4WW4xMn5+ITE=");
-  request.onload = function () {
-    // Begin accessing JSON data here
-    var data = JSON.parse(this.response)
-
-    if(request.status >= 200 && request.status < 400) {
-    data.forEach(movie => {
-      console.log(movie.title)
-    })
-    } else {
-      console.log('error')
-    }
-  }
-
-  // Send request
-  request.send()
-}
-*/
